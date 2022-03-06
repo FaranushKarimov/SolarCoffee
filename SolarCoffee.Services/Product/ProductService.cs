@@ -15,23 +15,63 @@ namespace SolarCoffee.Services.Product
         {
             _db = dbContext;
         }
-        public ServiceResponse<bool> ArchiveProduct(int id)
+        public ServiceResponse<Data.Models.Product> ArchiveProduct(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var product = _db.Products.Find(id);
+                product.IsArchived = true;
+                _db.SaveChanges();
+                return new ServiceResponse<Data.Models.Product>
+                {
+                    Data = product,
+                    Time = DateTime.UtcNow,
+                    Message = "Archived Product",
+                    IsSuccess = true
+                };
+            } catch(Exception e)
+            {
+                return new ServiceResponse<Data.Models.Product>
+                {
+                    Data = null,
+                    Time = DateTime.UtcNow,
+                    Message = e.StackTrace,
+                    IsSuccess = false
+                };
+            }
         }
 
-        public ServiceResponse<bool> CreateProduct(Data.Models.Product product)
+        public ServiceResponse<Data.Models.Product> CreateProduct(Data.Models.Product product)
         {
-            _db.Products.Add(product);
-            var newInventory = new ProductInventory()
+            try
             {
-
-            };
-            _db.SaveChanges();
-            return new ServiceResponse<bool>
+                _db.Products.Add(product);
+                var newInventory = new ProductInventory
+                {
+                    Product = product,
+                    QuantityOnHand = 0,
+                    IdealQuantity = 10
+                };
+                _db.ProductInventories.Add(newInventory);
+                _db.SaveChanges();
+                return new ServiceResponse<Data.Models.Product>
+                {
+                    Data = product,
+                    Time = DateTime.UtcNow,
+                    Message = "Saved new Product",
+                    IsSuccess = true
+                };
+            }
+            catch(Exception e)
             {
-
-            };
+                return new ServiceResponse<Data.Models.Product>
+                {
+                    Data = product,
+                    Time = DateTime.UtcNow,
+                    Message = "Error saving new Product",
+                    IsSuccess = false
+                };
+            }
         }
 
         public List<Data.Models.Product> GetAllProducts()
