@@ -19,14 +19,21 @@ namespace SolarCoffee.Services.Inventory
             _db = dbContext;
             _logger = logger;
         }
-        public void CreateSnapshot()
+        private void CreateSnapshot(ProductInventory inventory)
         {
-            throw new NotImplementedException();
+            var now = DateTime.UtcNow;
+
+            var snapshot = new ProductInventorySnapshot
+            {
+                SnapshotTime = now,
+                Product = inventory.Product,
+                QuantityOnHand = inventory.QuantityOnHand
+            };
         }
 
         public ProductInventory GetByProductId(int productId)
         {
-            throw new NotImplementedException();
+            return _db.ProductInventories.Include(pi => pi.Product).FirstOrDefault(pi => pi.Product.Id == productId);
         }
 
         public List<ProductInventory> GetCurrentInventory()
@@ -49,7 +56,7 @@ namespace SolarCoffee.Services.Inventory
 
                 try
                 {
-                    CreateSnapshot();
+                    CreateSnapshot(inventory);
                 } catch(Exception e)
                 {
                     _logger.LogError("Error creating inventory snapshot.");

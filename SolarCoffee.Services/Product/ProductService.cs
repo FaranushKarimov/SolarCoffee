@@ -68,7 +68,7 @@ namespace SolarCoffee.Services.Product
                 {
                     Data = product,
                     Time = DateTime.UtcNow,
-                    Message = "Error saving new Product",
+                    Message = e.StackTrace,
                     IsSuccess = false
                 };
             }
