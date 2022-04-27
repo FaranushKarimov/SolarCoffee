@@ -43,7 +43,8 @@ namespace SolarCoffee.Services.Inventory
 
         public List<ProductInventorySnapshot> GetSnapshotHistory()
         {
-            throw new NotImplementedException();
+            var earliest = DateTime.UtcNow - TimeSpan.FromHours(6);
+            return _db.ProductInventorySnapshots.Include(snap => snap.Product).Where(snap => snap.SnapshotTime > earliest && !snap.Product.IsArchived).ToList();
         }
 
         public ServiceResponse<ProductInventory> UpdateUnitsAvailable(int id, int adjustment)
